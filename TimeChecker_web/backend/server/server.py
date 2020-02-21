@@ -22,10 +22,11 @@ def login2():
 	v = request.form.get('time_text')
 	print(v)
 
-	f = open(day + ".txt", "w")
+	f = open("temp.txt", "w")
+	f.write(day + '\n')
 	f.write(v)
 	f.close()
-	os.system("time_checker_engine.exe " + day)
+	os.system("real_web_time_db.exe")
 	if request.method == 'POST':
 		return 'POST'
 

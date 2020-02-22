@@ -13,6 +13,10 @@ app = Flask(__name__)
 def hello():
     return "Hello World!"
 
+@app.route('/abc')
+def abc():
+	return "ABC"
+
 @app.route('/login2', methods=['POST'])
 def login2():
 	print("here OK")

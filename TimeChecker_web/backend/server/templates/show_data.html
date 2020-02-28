@@ -5,9 +5,15 @@
     </head>
     <body>
         <h1>show data 입니다</h1>
-        <form action="http://localhost:5000/get_data" method="POST">
+        <form action="http://localhost:5000/get_recode_data" method="POST">
             <label>보고싶은 날짜를 적으세요 : </label>
             <input type='text' name='day'></br>
+            <input type="submit" value="전송">
+        </form>
+
+        <h1>Total_recode 가 보고싶으면 아래 전송을 클릭하세요</h1>
+        <form action="http://localhost:5000/get_total_recode_data" method="POST">
+            <label>total_recode</label>
             <input type="submit" value="전송">
         </form>
     </body>

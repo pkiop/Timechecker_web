@@ -1,20 +1,85 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-    </head>
-    <body>
-        <h1>show data 입니다</h1>
-        <form action="http://localhost:5000/get_recode_data" method="POST">
-            <label>보고싶은 날짜를 적으세요 : </label>
-            <input type='text' name='day'></br>
-            <input type="submit" value="전송">
-        </form>
 
-        <h1>Total_recode 가 보고싶으면 아래 전송을 클릭하세요</h1>
-        <form action="http://localhost:5000/get_total_recode_data" method="POST">
-            <label>total_recode</label>
-            <input type="submit" value="전송">
+<head>
+    <meta charset="" arset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <style>
+        div {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Latest compiled and minified CSS -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+
+
+
+    <nav class="navbar navbar-light" style="background-color:  #e3f2fd; ">
+        <a class="navbar-brand" href="http://localhost:5000">Time Manager</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="http://localhost:5000/input">입력하기 <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://localhost:5000/show_data">시간표보기</a>
+                </li>
+               
+            </ul>
+
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="form-group" style="margin:20px;">
+           <h1>showdata</h1>
+        </div>      
+    </div>
+    <div class="container">
+
+        <form action="http://localhost:5000/show_time_table" method="POST">
+            <div class="form-group">
+                <label for="exampleFormControlInput1" style="font-size: x-large">날짜 입력</label>
+                <input type='text' name='day' class="form-control" id="exampleFormControlInput1" style="float: none; width:20%; margin : 0 auto;">
+            </div>
+            <button style="margin:10px 0px 10px 0px;" name='day' type="submit" class="btn btn-primary" style="float: none; width:20%; margin : 0 auto;">시간표</button>
         </form>
-    </body>
+        <hr style="width:50%;">
+
+        <form action="http://localhost:5000/get_total_recode_data" method="POST">
+            <button style="margin:10px 0px 10px 0px;" style="float: none; width:20%; margin : 0 auto;" type="submit" class="btn btn-primary ">모든 정보 보기</button>
+        </form>
+        <hr style="width:50%;">
+
+        <form action="http://localhost:5000/get_recode_data" method="POST">
+            <div class="form-group">
+                <label for="exampleFormControlInput1" style="font-size: x-large">날짜 입력</label>
+                <input type='text' name='day' class="form-control" id="exampleFormControlInput1" style="float: none; width:20%; margin : 0 auto;">
+            </div>
+            <button style="margin:10px 0px 0px 0px;" type="submit" class="btn btn-primary" style="float: none; width:20%; margin : 0 auto;">입력정보</button>
+        </form>
+    </div>
+
+
+</body>
+
 </html>

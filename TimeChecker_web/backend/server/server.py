@@ -20,10 +20,11 @@ def min_to_hour_minutes(minutes):
 	ret += temp_ret
 	return ret
 
-
-
 @app.route('/')
 def main():
+	rt = render_template('index.html')
+	print(type(rt))
+	print(rt)
 	return render_template('index.html')
 
 @app.route('/input')
@@ -46,9 +47,11 @@ def to_engine():
 	f = open("temp.txt", "w")
 	f.write(day + '\n')
 	f.write(v)
+	f.write("\nend")
 	f.close()
 	os.system("real_web_time_db.exe")
-	os.system("timechecker_processing.exe " + day)
+	
+	#os.system("timechecker_processing.exe " + day)
 	if request.method == 'POST':
 		return 'POST, to_engine'
 
@@ -85,8 +88,6 @@ def get_recode_data():
 			<th>consume</th>
 
 """
-
-
 
 		for i in rows:
 			html += "<tr>"
@@ -146,7 +147,99 @@ def get_total_recode_data():
 		return html
 	except:
 		return "total_recode에서 에러가 났습니다."
+
+@app.route('/show_time_table', methods=['POST'])
+def show_time_table():
+	conn = pymysql.connect(host='127.0.0.1', user='root', password="q1w2e3r4!!", db='test')
+	curs = conn.cursor()
+	day = request.form.get('day')
+
+	html = render_template('time_table_front.html')
+
+	html += """
+        <div class="form-group" style="margin:20px;">
+            <div>
+    """
+	html += "<h1>" + str(day) + "의 time table 입니다 </h1>"
+	html += """
+        </div>
+    </div>
+	"""
+	html += render_template('time_table_middle.html')
 	
+	sql = "select * from RECODE" + day
+	compact_list = []
+	#try:
+	curs.execute(sql)
+	rows = curs.fetchall()
+
+	A_ascii_int = 65
+	b_ascii_int = 97
+	for x in rows:
+		print(x)
+		in_com_list = []
+		
+		temp_str = x[1]
+		if ord(temp_str[-1]) == 13 or ord(temp_str[-1]) == 10 :
+			temp_str = temp_str[0:-1]
+		if ord(temp_str[-1]) == 13 or ord(temp_str[-1]) == 10 :
+			temp_str = temp_str[0:-1]
+		in_com_list.append(temp_str)		
+
+		start_minute = x[2] * 60 + x[3] - 240
+		if start_minute < 0 :
+			start_minute += 1440
+
+		in_com_list.append(start_minute)
+		in_com_list.append(x[7] + start_minute)
+		if x[6] == 'A':
+			in_com_list.append(A_ascii_int)
+			A_ascii_int += 1
+		elif x[6] == 'b':
+			in_com_list.append(b_ascii_int)
+			b_ascii_int += 1
+		else :
+			print('A, b만 지원합니다.')
+		compact_list.append(in_com_list)
+	#except:
+	#	return "show_time_table에서 sql에러가 남"
+	for x in compact_list:
+		for y in x:
+			print(y, end=" ")
+		print()
+
+	m_html = ""
+	m_html += "<tr>"
+
+	for i in range(1440):
+		if(i%60 == 0):
+			m_html += "<th>"
+			m_html += str((i//60 + 4) % 24)
+			m_html += "</th>"
+
+		get_success = False
+		for x in compact_list:
+			if x[1] <= i and i < x[2]:
+				get_success = True
+				m_html += "<th class="
+				m_html += chr(x[3])
+				m_html += ">"
+				if len(x[0]) > i - x[1]:
+					m_html += (x[0][i - x[1]])
+				#m_html += chr(x[3])
+				m_html += "</th>\n"
+				break
+		if get_success == False:
+			m_html += "<th class=empty"
+			m_html += ">"
+			m_html += "</th>\n"
+
+		if (i+1)%60 == 0:
+			m_html += "</tr>\n<tr>"
+
+	html += m_html
+	html += render_template('time_table_back.html')
+	return html
 
 
 if __name__ == '__main__':

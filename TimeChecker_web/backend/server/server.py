@@ -1,18 +1,19 @@
-#main_server
+﻿#main_server
 '''
 main server
 '''
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 import os
 import pymysql
+import sys
 
+myip = "localhost"
 app = Flask(__name__)
 
 def min_to_hour_minutes(minutes):
 	ret = ""
 	ret += str(minutes // 60);
-	print(ret)
 	ret += ':'
 	temp_ret = str(minutes % 60)
 	if minutes % 60 < 10 :
@@ -20,55 +21,87 @@ def min_to_hour_minutes(minutes):
 	ret += temp_ret
 	return ret
 
+def make_time_consume(start_time_h ,start_time_m, end_time_h, end_time_m):
+	temp = int(start_time_h[0])
+	print(type(temp))
+	print(temp)
+	temp = int('0')
+	print(type(temp))
+	print(temp)
+	start_cal_h = 60 * (10 * (int(start_time_h[0]) - int('0')) + (int(start_time_h[1]) - int('0')))
+	print(start_cal_h) 
+
+	start_cal_m = 10 * (int(start_time_m[0]) - int('0')) + (int(start_time_m[1]) - int('0'))
+	print(start_cal_m)
+	end_cal_h = 60 * (10 * (int(end_time_h[0]) - int('0')) + (int(end_time_h[1]) - int('0')))
+	end_cal_m = 10 * (int(end_time_m[0]) - int('0')) + (int(end_time_m[1]) - int('0'))
+
+	ret = end_cal_h + end_cal_m - start_cal_h - start_cal_m 
+	return ret
+
 @app.route('/')
 def main():
-	rt = render_template('index.html')
-	print(type(rt))
-	print(rt)
-	return render_template('index.html')
+	rt = render_template('header.html')
+	rt += render_template('index.html')
+	return rt
 
 @app.route('/input')
 def input():
-    return render_template('input.html')
+	rt = render_template('header.html')
+	rt += render_template('input.html')
+	return rt
 
-@app.route('/abc')
-def abc():
-	return "ABC"
-
-@app.route('/to_engine', methods=['POST'])
-def to_engine():
-	print("here OK")
-	#v = request.form['main2']
+@app.route('/many_put', methods=['POST'])
+def many_put():
+	print("server.py : many_put")
 	day = request.form.get('day')
-	print(day)
 	v = request.form.get('time_text')
+	html = day + '<p>' + v
+	print(day)
 	print(v)
+	data = []
+	temp_data = ""
+	for x in v:
+		temp_data += x
+		if x == '\n':
+			data.append(temp_data)
+			temp_data = ""
 
-	f = open("temp.txt", "w")
-	f.write(day + '\n')
-	f.write(v)
-	f.write("\nend")
-	f.close()
-	os.system("real_web_time_db.exe")
-	
-	#os.system("timechecker_processing.exe " + day)
-	if request.method == 'POST':
-		return 'POST, to_engine'
+	for x in data:
+		print(x)
+	# f = open("temp2.txt", "w", encoding="cp949")
+	# f.write(day + '\n')
+	# f.write(v)
+	# f.write("\nend")
+	# f.close()
+	# with open('temp2.txt', mode="r") as fd:
+	# 	print("f_read")
+	# 	content = fd.read()
+	# with open('temp.txt', mode="w") as fd:
+	# 	print("f_write")
+	# 	print(content)
+	# 	fd.write(content)
+	# os.system("real_web_time_db.exe")
+	return html
+	# if request.method == 'POST':
+	# 	return redirect('/') 
+	# else:
+	# 	return "post만 가능" 
 
 @app.route('/show_data')
 def show_data():
-	print("in show_data")
-	return render_template('show_data.html')
+	rt = render_template('header.html')
+	rt += render_template('show_data.html')
+	return rt
 
 @app.route('/get_recode_data', methods=['POST'])
 def get_recode_data():
 	print("get_recode_DATA")
 	html = "<h1>get_recode_DATA</h1>";
-	conn = pymysql.connect(host = '127.0.0.1', user = 'root', password = 'q1w2e3r4!!', db = 'test')
+	conn = pymysql.connect(host = myip, user = 'root', password = 'q1w2e3r4!!', db = 'test')
 	curs = conn.cursor()
 
 	day = request.form.get('day')
-	print(day)
 
 	sql = "select * from RECODE" + day
 	try:
@@ -100,19 +133,22 @@ def get_recode_data():
 		conn.close()
 		return html
 	except:
+		conn.close()
 		return day + "는 없습니다. "
 	
 @app.route('/get_total_recode_data', methods=['POST'])
 def get_total_recode_data():
 	print("get_total_recode_DATA")
-	html = "<h1>get_total_recode_DATA</h1>";
-	conn = pymysql.connect(host = '127.0.0.1', user = 'root', password = 'q1w2e3r4!!', db = 'test')
+	conn = pymysql.connect(host = myip, user = 'root', password = 'q1w2e3r4!!', db = 'test')
 	curs = conn.cursor()
 
 	sql = "select * from total_recode"
 	try:
 		curs_ret = curs.execute(sql)
 		rows = curs.fetchall()
+		html = render_template('header.html')
+		html += "<h1>get_total_recode_DATA</h1>";
+
 		html += """
 		<table>
 			<th>id</th>
@@ -132,7 +168,6 @@ def get_total_recode_data():
 			html += "<tr>"
 			t_cnt = 0
 			for j in i:
-				print(j)
 				html += "<td>"
 				html += str(j) + '\t'
 				html += "</td>"
@@ -142,19 +177,20 @@ def get_total_recode_data():
 					html += "</td>"
 				t_cnt += 1
 			html += "</tr>"
-		html += "</table>"
+		html += "</table></body></html>"
 		conn.close()
 		return html
 	except:
+		conn.close()
 		return "total_recode에서 에러가 났습니다."
 
 @app.route('/show_time_table', methods=['POST'])
 def show_time_table():
-	conn = pymysql.connect(host='127.0.0.1', user='root', password="q1w2e3r4!!", db='test')
+	conn = pymysql.connect(host=myip, user='root', password="q1w2e3r4!!", db='test')
 	curs = conn.cursor()
 	day = request.form.get('day')
-
-	html = render_template('time_table_front.html')
+	html = render_template('header.html')
+	html += render_template('time_table_front.html')
 
 	html += """
         <div class="form-group" style="margin:20px;">
@@ -176,7 +212,6 @@ def show_time_table():
 	A_ascii_int = 65
 	b_ascii_int = 97
 	for x in rows:
-		print(x)
 		in_com_list = []
 		
 		temp_str = x[1]
@@ -241,7 +276,109 @@ def show_time_table():
 	html += render_template('time_table_back.html')
 	return html
 
+@app.route('/new_show_time')
+def new_show_time():
+	rt = render_template('header.html')
+	rt += render_template('seperate_data_input.html')
+	return rt
+
+@app.route('/new_show_time_table', methods=['POST'])
+def new_show_time_table():
+	print("new_show")
+	conn = pymysql.connect(host=myip, user='root', password="q1w2e3r4!!", db='test')
+	curs = conn.cursor()
+	
+	day = '200304' #로그인 시에 이미 정보를 안다고 가정 
+	state = request.form.get('state')
+	if state == "공부":
+		state = 'A'
+	if state == "그 외":
+		state = 'b'
+	start_time_h = request.form.get('start_time_h')
+	start_time_m = request.form.get('start_time_m')
+	end_time_h = request.form.get('end_time_h')
+	end_time_m = request.form.get('end_time_m')
+	doing = request.form.get('doing')
+	html = state + ' ' + start_time_h + ' ' + start_time_m + ' ' + end_time_h + ' ' + end_time_m + ' ' + doing
+	consume_time = make_time_consume(start_time_h, start_time_m, end_time_h, end_time_m)
+
+	sql = "INSERT INTO RECODE" + day
+	sql += "(workname, start_time_h, start_time_m, end_time_h, end_time_m, property, time_consume)"
+	sql += " values('"
+	sql += doing
+	sql += "', "
+	sql += start_time_h
+	sql += ", "
+	sql += start_time_m
+	sql += ", "
+	sql += end_time_h
+	sql += ", "
+	sql += end_time_m
+	sql += ", '"
+	sql += state
+	sql += "', "
+	sql += str(consume_time)
+	sql += ");"
+
+	sql2 = "SELECT A_SUM, B_SUM, Achievements from total_recode"
+	sql2 += " where recode_table_num = '"
+	sql2 += day
+	sql2 += "';"
+
+	sql3_A_SUM = "UPDATE total_recode set A_SUM = '"
+	sql3_B_SUM = "UPDATE total_recode set B_SUM = '"
+	sql3_Achievements = "UPDATE total_recode set Achievements = '"
+	sql3_last = "' where recode_table_num = "
+	sql3_last += day
+
+	try:
+		curs.execute(sql)
+		conn.commit()
+		print("execute 성공 ")
+		print(sql2)
+		curs.execute(sql2)
+		rows = curs.fetchall()
+		print(type(rows))
+		print(type(rows[0]))
+		print(type(rows[0][0]))
+		print(rows)
+		conn.commit()
+		print("STate" + state)
+		if state == 'A':
+			sql3_A_SUM += str(rows[0][0] + consume_time)
+			sql3_A_SUM += sql3_last
+			curs.execute(sql3_A_SUM)
+			temp_str = rows[0][2]
+			print(temp_str)
+			for x in temp_str:
+				print(ord(x))
+
+			if ord(temp_str[-1]) == 13 or ord(temp_str[-1]) == 10 :
+				temp_str = temp_str[0:-1]
+			if ord(temp_str[-1]) == 13 or ord(temp_str[-1]) == 10 :
+				temp_str = temp_str[0:-1]
+
+			print(temp_str)
+			sql3_Achievements += str(temp_str + ' ' + doing)
+			sql3_Achievements += sql3_last
+			curs.execute(sql3_Achievements)
+
+		elif state == 'b':
+			sql3_B_SUM += str(rows[0][1] + consume_time)
+			sql3_B_SUM += sql3_last
+			curs.execute(sql3_B_SUM)
+		else:
+			print("A도 아니고 B 도 아니고")
+		conn.commit()
+
+	except:
+		conn.close()
+		return day + "table 이 없습니다. 먼저 만드세요"
+
+	conn.close()
+	return redirect('/') 
+
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
 

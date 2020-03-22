@@ -1,0 +1,2 @@
+This is DB access info. host, user, password, db
+localhost root q1w2e3r4!! text

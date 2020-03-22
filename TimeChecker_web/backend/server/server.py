@@ -8,7 +8,10 @@ import os
 import pymysql
 import sys
 
-myip = "localhost"
+In_host = ""
+In_user = ""
+In_password = ""
+In_db = ""
 app = Flask(__name__)
 
 def min_to_hour_minutes(minutes):
@@ -69,24 +72,8 @@ def many_put():
 
 	for x in data:
 		print(x)
-	# f = open("temp2.txt", "w", encoding="cp949")
-	# f.write(day + '\n')
-	# f.write(v)
-	# f.write("\nend")
-	# f.close()
-	# with open('temp2.txt', mode="r") as fd:
-	# 	print("f_read")
-	# 	content = fd.read()
-	# with open('temp.txt', mode="w") as fd:
-	# 	print("f_write")
-	# 	print(content)
-	# 	fd.write(content)
-	# os.system("real_web_time_db.exe")
 	return html
-	# if request.method == 'POST':
-	# 	return redirect('/') 
-	# else:
-	# 	return "post만 가능" 
+
 
 @app.route('/show_data')
 def show_data():
@@ -98,7 +85,7 @@ def show_data():
 def get_recode_data():
 	print("get_recode_DATA")
 	html = "<h1>get_recode_DATA</h1>";
-	conn = pymysql.connect(host = myip, user = 'root', password = 'q1w2e3r4!!', db = 'test')
+	conn = pymysql.connect(host = In_host, user = In_user, password = In_password, db = In_db)
 	curs = conn.cursor()
 
 	day = request.form.get('day')
@@ -139,7 +126,7 @@ def get_recode_data():
 @app.route('/get_total_recode_data', methods=['POST'])
 def get_total_recode_data():
 	print("get_total_recode_DATA")
-	conn = pymysql.connect(host = myip, user = 'root', password = 'q1w2e3r4!!', db = 'test')
+	conn = pymysql.connect(host = In_host, user = In_user, password = In_password, db = In_db)
 	curs = conn.cursor()
 
 	sql = "select * from total_recode"
@@ -186,7 +173,7 @@ def get_total_recode_data():
 
 @app.route('/show_time_table', methods=['POST'])
 def show_time_table():
-	conn = pymysql.connect(host=myip, user='root', password="q1w2e3r4!!", db='test')
+	conn = pymysql.connect(host = In_host, user = In_user, password = In_password, db = In_db)
 	curs = conn.cursor()
 	day = request.form.get('day')
 	html = render_template('header.html')
@@ -285,7 +272,7 @@ def new_show_time():
 @app.route('/new_show_time_table', methods=['POST'])
 def new_show_time_table():
 	print("new_show")
-	conn = pymysql.connect(host=myip, user='root', password="q1w2e3r4!!", db='test')
+	conn = pymysql.connect(host = In_host, user = In_user, password = In_password, db = In_db)
 	curs = conn.cursor()
 	
 	day = '200304' #로그인 시에 이미 정보를 안다고 가정 
@@ -380,5 +367,14 @@ def new_show_time_table():
 
 
 if __name__ == '__main__':
+    f = open("DBaccessInfo.txt", "r")
+    xx = f.readline()
+    print(xx)
+    xx = f.readline()
+    xxx = xx.split()
+    In_host = xxx[0]
+    In_user = xxx[1]
+    In_password = xxx[2]
+    In_db = xxx[3]
     app.run(host='0.0.0.0')
 

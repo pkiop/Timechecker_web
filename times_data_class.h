@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 
 struct times {
 	int start_hours;

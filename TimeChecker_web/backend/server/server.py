@@ -16,7 +16,7 @@ app = Flask(__name__)
 
 def min_to_hour_minutes(minutes):
 	ret = ""
-	ret += str(minutes // 60);
+    ret += str(minutes // 60)
 	ret += ':'
 	temp_ret = str(minutes % 60)
 	if minutes % 60 < 10 :

@@ -1,0 +1,39 @@
+var http = require('http');
+var url = require('url');
+var topic = require('./lib/topic');
+
+var app = http.createServer(function(request, response) {
+    var _url = request.url;
+    var queryData = url.parse(_url, true).query;
+    var pathname = url.parse(_url, true).pathname;
+    if(pathname === '/') {
+        if(queryData.id === undefined) {
+            topic.home(request, response);
+        }
+        else {
+            topic.page(request, response);
+        }
+    }
+    if(pathname === '/puttime') {
+        //topic.puttime(request, response); 
+        console.log("no use ");
+    } else if (pathname === '/puttime_process') {
+        topic.puttime_process(request, response);
+    } else if (pathname === '/selecttable') {
+        topic.selecttable(request, response);
+    } else if (pathname === '/showNupdatetable') {
+        topic.showNupdatetable(request, response);  
+    } else if (pathname === '/showtable_process') {
+        topic.showtable_process(request, response);
+    } else if (pathname === '/delete_process') {
+        topic.delete_process(request, response);
+    } else if (pathname === '/confirm_process') {
+        topic.confirm_process(request, response);
+    } else if (pathname === '/selectSleepTime') {
+        topic.selectSleepTime(request, response);
+    } else if (pathname === '/maketable_process') {
+        topic.maketable_process(request, response);
+    }
+
+});
+app.listen(3000);

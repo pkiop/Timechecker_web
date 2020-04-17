@@ -73,7 +73,7 @@ module.exports = {
             var post = qs.parse(body);
             console.log("전형적인 post read : ", post);
 
-            var date_only_number = post.date[2] + post.date[3] + post.date[5] + post.date[6] + post.date[8] + post.date[9]; 
+            var date_only_number = post.date;
             var except_check = '';
 
             if(post.except_check === 'on') { except_check = '1'; }
@@ -113,7 +113,8 @@ module.exports = {
                         throw error;
                     }
                 }
-                response.writeHead(302, {Location: `/showNupdatetable`});
+                console.log("puttime_process -> redirect");
+                response.writeHead(302, {Location: `/showNupdatetable?date=${date_only_number}`});
                 response.end();  
             });
         });
@@ -127,27 +128,32 @@ module.exports = {
         response.end(html);
     },
     
-    showNupdatetable:function(request,response) {
-        this.refresh_db();
+    showNupdatetable:function(request,response,queryData) {
         var title = 'show N update table';
-        var body = template.puttime(tempdate);
+        var body = template.puttime(queryData.date);
         body += '<hr>';
-        body += template.showDBTable(dbgetdata, tempdate);
-        var html = template.HTML(title, body);
-        console.log("tempdata : ", tempdate);
-        response.writeHead(200);
-        response.end(html);
-    },
-    
-    refresh_db:function() {
-        db.query(`SELECT * FROM day` + tempdate, function(error, results) {
+        db.query(`SELECT * FROM day` + queryData.date, function(error, results) {
             if(error) {
                 throw error;
             }
-            dbgetdata = results;
+            body += template.showDBTable(results, queryData.date);
+            var html = template.HTML(title, body);
+            response.writeHead(200);
+            response.end(html);
         });
+    },
+    
+    refresh_db:function(date) {
+        console.log("refresh_db date = ", date);
+        db.query(`SELECT * FROM day` + date, function(error, results) {
+            if(error) {
+                throw error;
+            }
+        });
+        console.log("just end");
     }, 
 
+ 
     showtable_process:function(request, response) {
         console.log("showtable:process");
         var title = 'show table';
@@ -156,19 +162,15 @@ module.exports = {
             body = body + data;
         });
         request.on('end', function() {
-            console.log('body read : ', body);
             var post = qs.parse(body);
-            console.log('post read : ', post);
-            if(post.date == undefined) {
-                post.date = tempdate;
-            }
+ 
             var date_only_number = post.date[2] + post.date[3] + post.date[5] + post.date[6] + post.date[8] + post.date[9]; 
             console.log("showtable_process post : ", post.date); 
             db.query(`SELECT * FROM day` + date_only_number, function(error, results) {
                 if(error) {
                     if(error.errno === 1146) {
                         console.log("redirection to selectSleeptime");
-                        response.writeHead(302, {Location: `/selectSleepTime`});
+                        response.writeHead(302, {Location: `/selectSleepTime?date=${date_only_number}`});
                         response.end();
                         console.log("endendend");
                         return;
@@ -180,7 +182,7 @@ module.exports = {
                 else {
                     dbgetdata = results;
                     console.log("redirection to showNupdatetable");
-                    response.writeHead(302, {Location: `/showNupdatetable`});
+                    response.writeHead(302, {Location: `/showNupdatetable?date=${date_only_number}`});
                     response.end();    
 
                 }
@@ -246,11 +248,11 @@ module.exports = {
         });
     },
 
-    selectSleepTime:function(request, response) {
+    selectSleepTime:function(request, response, queryData) {
 
         var body = '';
         var title = 'show table';
-        var body = template.selectSleepTime(tempdate);
+        var body = template.selectSleepTime(queryData.date);
         var html = template.HTML(title, body);
         response.writeHead(200);
         response.end(html);
@@ -265,8 +267,8 @@ module.exports = {
         request.on('end', function(){
             var post = qs.parse(body);
             console.log(post);
-            var date_only_number = post.date[2] + post.date[3] + post.date[5] + post.date[6] + post.date[8] + post.date[9]; 
-
+            var date_only_number = post.date;
+            console.log("dateonlynumber : ", date_only_number);
             var create_query_string = 'CREATE TABLE day' + date_only_number;
             db.query(create_query_string + ` (
                 id INT PRIMARY KEY AUTO_INCREMENT,
@@ -288,21 +290,18 @@ module.exports = {
                     if(error3) {
                         throw error3;
                     }
-                    response.writeHead(302, {Location: `/`});
-                    response.end();    
+ 
                 });
                 db.query('INSERT INTO totalrecodes' + ` (daykey, year, month, day, sleepstart, sleepend, sleep) VALUES(?,?,?,?,?,?,?)`,[String(date_only_number), date_only_number[0]+date_only_number[1], date_only_number[2]+date_only_number[3], date_only_number[4]+date_only_number[5], post.starth + ':' + post.startm, post.endh + ':' + post.endm, String(puttime_consume_calculation(post.starth, post.startm, post.endh, post.endm))],
                 function(error3, result3) {
                     if(error3) {
                         throw error3;
                     }
-                    response.writeHead(302, {Location: `/`});
-                    response.end();    
+                    response.writeHead(302, {Location: `/showNupdatetable?date=${date_only_number}`});
+                    response.end();  
                 });
             });
-            console.log("post : ", post);
-            response.writeHead(302, {Location: `/`});
-            response.end();  
+ 
         });
     }
 }

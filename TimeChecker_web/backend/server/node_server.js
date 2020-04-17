@@ -6,6 +6,7 @@ var app = http.createServer(function(request, response) {
     var _url = request.url;
     var queryData = url.parse(_url, true).query;
     var pathname = url.parse(_url, true).pathname;
+    console.log("queryData : ", queryData);
     if(pathname === '/') {
         if(queryData.id === undefined) {
             topic.home(request, response);
@@ -22,7 +23,7 @@ var app = http.createServer(function(request, response) {
     } else if (pathname === '/selecttable') {
         topic.selecttable(request, response);
     } else if (pathname === '/showNupdatetable') {
-        topic.showNupdatetable(request, response);  
+        topic.showNupdatetable(request, response,queryData);  
     } else if (pathname === '/showtable_process') {
         topic.showtable_process(request, response);
     } else if (pathname === '/delete_process') {
@@ -30,9 +31,12 @@ var app = http.createServer(function(request, response) {
     } else if (pathname === '/confirm_process') {
         topic.confirm_process(request, response);
     } else if (pathname === '/selectSleepTime') {
-        topic.selectSleepTime(request, response);
+        topic.selectSleepTime(request, response, queryData);
     } else if (pathname === '/maketable_process') {
         topic.maketable_process(request, response);
+    } else {
+        response.writeHead(404);
+        response.end('Not found');
     }
 
 });

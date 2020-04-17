@@ -130,8 +130,8 @@ module.exports = {
                 <input type="number" maxlength="2" max="23" min="0" onKeyPress="return numkeyCheck(event)" name="starth" value="23">
                 <input type="number" maxlength="2" max="59" min="0" onKeyPress="return numkeyCheck(event)" name="startm" value="00">
                 :
-                <input type="number" maxlength="2" max="23" min="0" onKeyPress="return numkeyCheck(event)" name="endh" placeholder="${nowtimeh}">
-                <input type="number" maxlength="2" max="59" min="0" onKeyPress="return numkeyCheck(event)" name="endm" placeholder="${nowtimem}">
+                <input type="number" maxlength="2" max="23" min="0" onKeyPress="return numkeyCheck(event)" name="endh" value="${nowtimeh}">
+                <input type="number" maxlength="2" max="59" min="0" onKeyPress="return numkeyCheck(event)" name="endm" value="${nowtimem}">
                 <input type="hidden" name="date" value="${date}">
 
                 <input type="submit" value="submit">
